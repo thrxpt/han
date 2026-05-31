@@ -3,6 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js'
 import ppqr from 'promptpay-qr'
 import qrcode from 'qrcode'
 import { sanitizeId, formatCurrency } from './lib/utils'
+import { t, getLang, onLangChange, type Lang } from './lib/i18n'
 
 interface AmountChangeEvent extends CustomEvent {
   detail: {
@@ -38,8 +39,14 @@ export class QrRender extends LitElement {
   @state()
   private setupCollapsed = true
 
+  @state()
+  private _lang: Lang = getLang()
+
   constructor() {
     super()
+    onLangChange((l) => {
+      this._lang = l
+    })
     const storedIds = window.localStorage.getItem('promptPayIds')
     if (storedIds) {
       const promptPayIds: PromptPayIdItem[] = JSON.parse(storedIds)
@@ -79,7 +86,7 @@ export class QrRender extends LitElement {
     if (!this.promptPayId) {
       return html`
         <div class="no-id-message">
-          <p>Please set your PromptPay ID first</p>
+          <p>${t('noIdMessage', this._lang)}</p>
         </div>
       `
     }
@@ -88,7 +95,7 @@ export class QrRender extends LitElement {
       this.noOfPeople > 1 && this.amount > 0
         ? html`<div class="split-info">
             <div class="total-amount">
-              <span class="label">Total:</span>
+              <span class="label">${t('total', this._lang)}</span>
               <span class="amount">${formatCurrency(this.totalAmount)}</span>
             </div>
             <div class="split-details">
@@ -109,11 +116,11 @@ export class QrRender extends LitElement {
                   <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
                   <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                 </svg>
-                ${this.noOfPeople} people</span
+                ${this.noOfPeople} ${t('people', this._lang)}</span
               >
               <span class="divider">•</span>
               <span class="per-person">
-                <span class="amount">${formatCurrency(this.amount)}</span> each
+                <span class="amount">${formatCurrency(this.amount)}</span> ${t('perPerson', this._lang)}
               </span>
             </div>
           </div>`
@@ -130,7 +137,7 @@ export class QrRender extends LitElement {
           <canvas id="qr-canvas"></canvas>
         </div>
         <div class="promptpay-id">
-          <span class="label">PromptPay ID:</span>
+          <span class="label">${t('promptpayLabel', this._lang)}</span>
           <span class="id">
             ${this.promptPayId}${' '}
             ${this.promptPayLabel
@@ -138,7 +145,7 @@ export class QrRender extends LitElement {
               : ''}
           </span>
           <button type="button" class="edit-button" @click=${this._showSetup}>
-            ${this.setupCollapsed ? 'edit' : 'close'}
+            ${this.setupCollapsed ? t('edit', this._lang) : t('close', this._lang)}
           </button>
         </div>
       </div>
@@ -173,7 +180,7 @@ export class QrRender extends LitElement {
         },
         (error) => {
           if (error) {
-            window.alert('Error rendering QR code')
+            window.alert(t('qrError', this._lang))
             console.error(error)
           }
         }

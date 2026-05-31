@@ -1,22 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="th">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#171717" />
-    <title>Han - Split Bills Easily</title>
+    <title>Han - แชร์บิลง่ายๆ</title>
     <meta
       name="description"
-      content="Han - Split bills easily with PromptPay QR code generation"
+      content="Han - แชร์บิลง่าย ๆ ด้วย QR code พร้อมเพย์"
     />
     <link rel="stylesheet" href="./src/index.css" />
+    <script type="module" src="/src/lang-switcher.ts"></script>
     <script type="module" src="/src/qr-render.ts"></script>
     <script type="module" src="/src/promptpay-setup.ts"></script>
     <script type="module" src="/src/input-group.ts"></script>
   </head>
   <body>
     <div class="container">
+      <header class="app-header"><lang-switcher></lang-switcher></header>
       <qr-render></qr-render>
       <promptpay-setup></promptpay-setup>
       <input-group></input-group>

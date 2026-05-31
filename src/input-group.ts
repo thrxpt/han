@@ -1,5 +1,6 @@
 import { css, html, LitElement } from 'lit'
-import { customElement, property } from 'lit/decorators.js'
+import { customElement, property, state } from 'lit/decorators.js'
+import { t, getLang, onLangChange, type Lang } from './lib/i18n'
 
 @customElement('input-group')
 export class InputGroup extends LitElement {
@@ -8,6 +9,16 @@ export class InputGroup extends LitElement {
 
   @property({ type: Number })
   noOfPeople = 1
+
+  @state()
+  private _lang: Lang = getLang()
+
+  constructor() {
+    super()
+    onLangChange((l) => {
+      this._lang = l
+    })
+  }
 
   private handleInput(e: Event) {
     const input = e.target as HTMLInputElement
@@ -41,7 +52,7 @@ export class InputGroup extends LitElement {
     return html`
       <div class="input-container">
         <div class="input-field">
-          <label for="amount-input">จำนวนเงิน (฿)</label>
+          <label for="amount-input">${t('amountLabel', this._lang)}</label>
           <input
             id="amount-input"
             type="number"
@@ -54,7 +65,7 @@ export class InputGroup extends LitElement {
           />
         </div>
         <div class="input-field">
-          <label for="no-of-people-input">หารกันกี่คน ?</label>
+          <label for="no-of-people-input">${t('peopleLabel', this._lang)}</label>
           <input
             id="no-of-people-input"
             type="number"

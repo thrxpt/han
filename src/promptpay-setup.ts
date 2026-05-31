@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
 import { sanitizeId } from './lib/utils'
+import { t, getLang, onLangChange, type Lang } from './lib/i18n'
 
 interface PromptPayIdItem {
   id: string
@@ -22,11 +23,17 @@ export class PromptPaySetup extends LitElement {
   @state()
   private labelValue = ''
 
+  @state()
+  private _lang: Lang = getLang()
+
   @property({ type: Boolean })
   collapsed = false
 
   constructor() {
     super()
+    onLangChange((l) => {
+      this._lang = l
+    })
     const storedIds = window.localStorage.getItem('promptPayIds')
     this.promptPayIds = storedIds ? JSON.parse(storedIds) : []
     if (
@@ -61,17 +68,17 @@ export class PromptPaySetup extends LitElement {
 
     return html`
       <div class="setup-container">
-        <h2>Set up PromptPay</h2>
+        <h2>${t('setupHeading', this._lang)}</h2>
         <form @submit=${this._onSubmit}>
           <div class="input-group">
-            <label for="promptpay-input">PromptPay ID</label>
+            <label for="promptpay-input">${t('promptpayId', this._lang)}</label>
             <div class="input-wrapper">
               <input
                 id="promptpay-input"
                 type="text"
                 inputmode="numeric"
-                placeholder="Phone number or National ID"
-                aria-label="PromptPay ID"
+                placeholder=${t('idPlaceholder', this._lang)}
+                aria-label=${t('promptpayId', this._lang)}
                 @input=${this._onInput}
                 .value=${this.inputValue}
               />
@@ -80,24 +87,24 @@ export class PromptPaySetup extends LitElement {
                     type="button"
                     class="clear-button"
                     @click=${this._clearInput}
-                    aria-label="Clear input"
+                    aria-label=${t('clearInput', this._lang)}
                   >
                     ✕
                   </button>`
                 : ''}
             </div>
             <p class="hint">
-              Enter your phone number or national ID without spaces or dashes
+              ${t('idHint', this._lang)}
             </p>
           </div>
           <div class="input-group">
-            <label for="label-input">Label (optional)</label>
+            <label for="label-input">${t('labelOptional', this._lang)}</label>
             <div class="input-wrapper">
               <input
                 id="label-input"
                 type="text"
-                placeholder="e.g. Personal, Business"
-                aria-label="Label"
+                placeholder=${t('labelPlaceholder', this._lang)}
+                aria-label=${t('labelAria', this._lang)}
                 @input=${this._onLabelInput}
                 .value=${this.labelValue}
               />
@@ -106,7 +113,7 @@ export class PromptPaySetup extends LitElement {
                     type="button"
                     class="clear-button"
                     @click=${this._clearLabel}
-                    aria-label="Clear label"
+                    aria-label=${t('clearLabel', this._lang)}
                   >
                     ✕
                   </button>`
@@ -118,12 +125,12 @@ export class PromptPaySetup extends LitElement {
             ?disabled=${!this.inputValue}
             class="submit-button"
           >
-            Add PromptPay ID
+            ${t('addId', this._lang)}
           </button>
         </form>
         ${this.promptPayIds.length > 0
           ? html`<div class="saved-ids">
-              <label>Saved PromptPay IDs:</label>
+              <label>${t('savedIds', this._lang)}</label>
               <div class="id-list">
                 ${this.promptPayIds.map(
                   (item, index) => html`
@@ -145,14 +152,14 @@ export class PromptPaySetup extends LitElement {
                           @click=${() => this._selectId(item.id)}
                           ?disabled=${item.id === this.selectedId}
                         >
-                          ${item.id === this.selectedId ? 'Selected' : 'Select'}
+                          ${item.id === this.selectedId ? t('selected', this._lang) : t('select', this._lang)}
                         </button>
                         <button
                           type="button"
                           class="action-button delete-button"
                           @click=${() => this._deleteId(index)}
                         >
-                          Delete
+                          ${t('delete', this._lang)}
                         </button>
                       </div>
                     </div>
@@ -180,7 +187,7 @@ export class PromptPaySetup extends LitElement {
     if (!this.inputValue) return
 
     if (this.promptPayIds.some((item) => item.id === this.inputValue)) {
-      window.alert('This PromptPay ID already exists')
+      window.alert(t('idExists', this._lang))
       return
     }
 
