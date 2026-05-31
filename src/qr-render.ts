@@ -189,6 +189,13 @@ export class QrRender extends LitElement {
   }
 
   static styles = css`
+    button,
+    input,
+    select,
+    textarea {
+      font-family: inherit;
+    }
+
     .qr-card {
       height: auto;
       width: 100%;

@@ -87,6 +87,13 @@ export class InputGroup extends LitElement {
       max-width: 100%;
     }
 
+    button,
+    input,
+    select,
+    textarea {
+      font-family: inherit;
+    }
+
     .input-container {
       display: grid;
       grid-template-columns: 1fr;

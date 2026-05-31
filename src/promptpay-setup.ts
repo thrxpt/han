@@ -276,6 +276,13 @@ export class PromptPaySetup extends LitElement {
       width: 100%;
     }
 
+    button,
+    input,
+    select,
+    textarea {
+      font-family: inherit;
+    }
+
     .setup-container {
       display: grid;
       grid-template-columns: 1fr;

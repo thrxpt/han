@@ -48,6 +48,13 @@ export class LangSwitcher extends LitElement {
       display: inline-block;
     }
 
+    button,
+    input,
+    select,
+    textarea {
+      font-family: inherit;
+    }
+
     .switch {
       display: inline-flex;
       align-items: center;
