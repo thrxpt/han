@@ -278,6 +278,7 @@ export class QrRender extends LitElement {
       padding: 1rem;
       color: #737373;
       font-size: 0.875rem;
+      text-wrap: balance;
     }
 
     .split-info {
