@@ -4,14 +4,12 @@ import ppqr from 'promptpay-qr'
 import qrcode from 'qrcode'
 import { sanitizeId, formatCurrency } from './lib/utils'
 import { t, getLang, onLangChange, type Lang } from './lib/i18n'
-
-interface AmountChangeEvent extends CustomEvent {
-  detail: {
-    amount: number
-    totalAmount: number
-    noOfPeople: number
-  }
-}
+import {
+  round2,
+  type AmountChangeDetail,
+  type Share,
+  type SplitMode,
+} from './lib/split'
 
 interface PromptPayIdItem {
   id: string
@@ -37,6 +35,18 @@ export class QrRender extends LitElement {
   noOfPeople = 1
 
   @state()
+  private mode: SplitMode = 'equal'
+
+  @state()
+  private shares: Share[] = []
+
+  @state()
+  private balanced = true
+
+  @state()
+  private selectedPerson = 0
+
+  @state()
   private setupCollapsed = true
 
   @state()
@@ -60,10 +70,20 @@ export class QrRender extends LitElement {
 
   firstUpdated() {
     this._renderQrCode()
-    window.addEventListener('amount-change', ((e: AmountChangeEvent) => {
-      this.amount = e.detail.amount
-      this.totalAmount = e.detail.totalAmount
-      this.noOfPeople = e.detail.noOfPeople
+    window.addEventListener('amount-change', ((e: CustomEvent) => {
+      const d = e.detail as AmountChangeDetail
+      this.mode = d.mode ?? 'equal'
+      this.totalAmount = d.totalAmount
+      this.noOfPeople = d.noOfPeople
+      this.shares = d.shares ?? []
+      this.balanced = d.balanced ?? true
+      if (this.selectedPerson >= this.shares.length) {
+        this.selectedPerson = 0
+      }
+      this.amount =
+        this.mode === 'custom'
+          ? (this.shares[this.selectedPerson]?.amount ?? 0)
+          : d.amount
       this._renderQrCode()
     }) as EventListener)
 
@@ -91,8 +111,32 @@ export class QrRender extends LitElement {
       `
     }
 
+    if (this.mode === 'custom' && !this.balanced) {
+      return html`
+        <div class="no-id-message">
+          <p>${t('unbalancedHint', this._lang)}</p>
+        </div>
+      `
+    }
+
     const splitInfo =
-      this.noOfPeople > 1 && this.amount > 0
+      this.mode === 'custom'
+        ? html`<div class="split-info">
+            <div class="total-amount">
+              <span class="label">${t('total', this._lang)}</span>
+              <span class="amount">${formatCurrency(this.totalAmount)}</span>
+            </div>
+            <div class="split-details">
+              <span class="per-person">
+                ${t('personShort', this._lang)}${this.selectedPerson + 1}
+              </span>
+              <span class="divider">•</span>
+              <span class="per-person">
+                <span class="amount">${formatCurrency(this.amount)}</span>
+              </span>
+            </div>
+          </div>`
+        : this.noOfPeople > 1 && this.amount > 0
         ? html`<div class="split-info">
             <div class="total-amount">
               <span class="label">${t('total', this._lang)}</span>
@@ -130,9 +174,27 @@ export class QrRender extends LitElement {
             </div>
           </div>`
 
+    const chips =
+      this.mode === 'custom'
+        ? html`<div class="chips">
+            ${this.shares.map(
+              (s, i) => html`
+                <button
+                  type="button"
+                  class="chip ${i === this.selectedPerson ? 'selected' : ''}"
+                  @click=${() => this._selectPerson(i)}
+                >
+                  ${t('personShort', this._lang)}${i + 1}
+                  ${s.value}${s.unit === '%' ? '%' : '฿'}
+                </button>
+              `
+            )}
+          </div>`
+        : ''
+
     return html`
       <div class="qr-card">
-        ${splitInfo}
+        ${splitInfo} ${chips}
         <div class="qr-wrapper">
           <canvas id="qr-canvas"></canvas>
         </div>
@@ -152,6 +214,11 @@ export class QrRender extends LitElement {
     `
   }
 
+  private _selectPerson(index: number) {
+    this.selectedPerson = index
+    this.amount = this.shares[index]?.amount ?? 0
+  }
+
   private _showSetup() {
     const setup = document.querySelector('promptpay-setup')
     if (setup) {
@@ -161,12 +228,12 @@ export class QrRender extends LitElement {
   }
 
   private _renderQrCode() {
-    if (!this.promptPayId) {
+    if (!this.promptPayId || (this.mode === 'custom' && !this.balanced)) {
       return
     }
 
     const payload = ppqr(this.promptPayId, {
-      amount: Number(formatCurrency(this.amount).replace('฿', '')),
+      amount: round2(this.amount),
     })
     const canvas = this.renderRoot.querySelector('#qr-canvas')
     if (canvas) {
@@ -257,6 +324,36 @@ export class QrRender extends LitElement {
 
     .amount {
       font-variant-numeric: tabular-nums;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .chip {
+      padding: 0.375rem 0.75rem;
+      border: 1px solid #404040;
+      border-radius: 9999px;
+      background: #262626;
+      color: #a3a3a3;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-variant-numeric: tabular-nums;
+      transition:
+        border-color 0.15s ease,
+        color 0.15s ease;
+    }
+
+    .chip:hover {
+      border-color: #737373;
+    }
+
+    .chip.selected {
+      border-color: #737373;
+      color: #f5f5f5;
     }
 
     .qr-wrapper {
