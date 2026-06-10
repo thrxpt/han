@@ -36,12 +36,15 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  padding: 1rem 0;
+  width: 100%;
+  max-width: 480px;
+  box-sizing: border-box;
+  padding: 1rem;
 }
 
 .app-header {
   position: absolute;
-  top: -1rem;
-  right: 0;
+  top: 0;
+  right: 1rem;
   z-index: 10;
 }

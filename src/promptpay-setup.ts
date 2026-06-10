@@ -426,6 +426,7 @@ export class PromptPaySetup extends LitElement {
     .id-details .value {
       color: #f5f5f5;
       font-size: 0.875rem;
+      overflow-wrap: anywhere;
     }
 
     .id-details .label {

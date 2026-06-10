@@ -256,6 +256,12 @@ export class QrRender extends LitElement {
   }
 
   static styles = css`
+    :host {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+    }
+
     button,
     input,
     select,
@@ -365,14 +371,29 @@ export class QrRender extends LitElement {
       padding: 0.25rem;
       border-radius: 0.5rem;
       border: 1px solid #404040;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    .qr-wrapper canvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
     }
 
     .promptpay-id {
       font-size: 0.75rem;
       display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 0.25rem;
       align-items: center;
       color: #a3a3a3;
+      max-width: 100%;
+    }
+
+    .promptpay-id .id {
+      overflow-wrap: anywhere;
     }
 
     .edit-button {
