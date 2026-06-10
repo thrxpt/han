@@ -259,7 +259,8 @@ export class InputGroup extends LitElement {
       padding: 0.5rem;
       border: 1px solid #404040;
       border-radius: 0.25rem;
-      font-size: 0.875rem;
+      /* 16px minimum prevents iOS Safari auto-zoom on focus */
+      font-size: 1rem;
       background: #262626;
       color: #f5f5f5;
       transition: border-color 0.15s ease;
@@ -360,6 +361,10 @@ export class InputGroup extends LitElement {
       .input-container {
         grid-template-columns: 1fr 1fr;
         gap: 1rem;
+      }
+
+      input {
+        font-size: 0.875rem;
       }
     }
   `

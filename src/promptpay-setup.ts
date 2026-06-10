@@ -332,10 +332,17 @@ export class PromptPaySetup extends LitElement {
       padding-right: 2rem;
       border: 1px solid #404040;
       border-radius: 0.25rem;
-      font-size: 0.875rem;
+      /* 16px minimum prevents iOS Safari auto-zoom on focus */
+      font-size: 1rem;
       background: #262626;
       color: #f5f5f5;
       transition: border-color 0.15s ease;
+    }
+
+    @media (min-width: 480px) {
+      input {
+        font-size: 0.875rem;
+      }
     }
 
     input:focus {
